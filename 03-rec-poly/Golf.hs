@@ -3,15 +3,9 @@
 module Golf where
 
 -- Exercise 1
-
-zipIndex :: [a] -> [(Int, a)]
-zipIndex = zip [1..]
-
-makeFilter :: Int -> (Int, a) -> Bool
-makeFilter 0 _ = False
-makeFilter d (idx, _) = idx `mod` d == 0
-
 skips :: [a] -> [[a]]
-skips [] = []
-skips es =
-  [(snd . unzip) $ filter (makeFilter i) (zipIndex es) | i <- [1..(length es)]]
+skips elements = [every i elements | i <- [1 .. (length elements)]]
+
+every :: Int -> [a] -> [a]
+every n elements =
+  [elements !! i | i <- [n - 1, n - 1 + n .. (length elements) - 1]]
