@@ -27,3 +27,10 @@ map' f = foldr (\x xs -> f x : xs) []
 
 myFoldl :: (a -> b -> a) -> a -> [b] -> a
 myFoldl f base = foldr (flip f) base
+
+-- Exercise 4
+sieveSundaram :: Integer -> [Integer]
+sieveSundaram n = 2 : (map (\x -> 2 * x + 1) . filter (\x -> notElem x removed)
+                       $ [1 .. n])
+  where removed = filter (<=n)
+                         [i + j + 2 * i * j | i <- [1 .. n], j <- [i .. n]]
