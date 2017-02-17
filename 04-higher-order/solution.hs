@@ -20,7 +20,7 @@ data Tree a = Leaf
 
 -- Exercise 3
 xor :: [Bool] -> Bool
-xor = odd . length . filter (\x -> x)
+xor = foldl (\x y -> if y then not x else x) False
 
 map' :: (a -> b) -> [a] -> [b]
 map' f = foldr (\x xs -> f x : xs) []
