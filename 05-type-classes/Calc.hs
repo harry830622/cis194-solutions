@@ -8,6 +8,7 @@ import ExprT
 import Parser
 import StackVM
 import Data.Maybe
+import qualified Data.Map as M
 
 -- Exercise 1
 eval :: ExprT -> Integer
@@ -67,3 +68,37 @@ instance Expr Program where
   lit x = (StackVM.PushI x) : []
   add x y = x ++ y ++ (StackVM.Add : [])
   mul x y = x ++ y ++ (StackVM.Mul : [])
+
+-- Exercise 6
+class HasVars a where
+  var :: String -> a
+
+data VarExprT = Lit Integer
+              | Add VarExprT VarExprT
+              | Mul VarExprT VarExprT
+              | Var String
+  deriving (Eq, Show)
+
+instance Expr VarExprT where
+  lit = Calc.Lit
+  add = Calc.Add
+  mul = Calc.Mul
+
+instance HasVars VarExprT where
+  var = Calc.Var
+
+-- Why not just write another "eval" function?
+instance Expr (M.Map String Integer -> Maybe Integer) where
+  lit x = const $ Just x
+  add f g = (\m -> if isNothing (f m) || isNothing(g m) then Nothing
+                   else Just $ fromJust (f m) + fromJust (g m))
+  mul f g = (\m -> if isNothing (f m) || isNothing(g m) then Nothing
+                   else Just $ fromJust (f m) * fromJust (g m))
+
+instance HasVars (M.Map String Integer -> Maybe Integer) where
+  var str = (\m -> M.lookup str m)
+
+withVars :: [(String, Integer)]
+            -> (M.Map String Integer -> Maybe Integer)
+            -> Maybe Integer
+withVars vs vExp = vExp $ M.fromList vs
