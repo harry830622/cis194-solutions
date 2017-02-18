@@ -1,22 +1,25 @@
 {-# OPTIONS_GHC -Wall #-}
 
+{-# LANGUAGE TypeSynonymInstances, FlexibleInstances #-}
+
 module Calc where
 
 import ExprT
 import Parser
+import StackVM
 import Data.Maybe
 
 -- Exercise 1
 eval :: ExprT -> Integer
-eval (Lit x) = x
-eval (Add x y) = eval x + eval y
-eval (Mul x y) = eval x * eval y
+eval (ExprT.Lit x) = x
+eval (ExprT.Add x y) = eval x + eval y
+eval (ExprT.Mul x y) = eval x * eval y
 
 -- Exercise 2
 evalStr :: String -> Maybe Integer
 evalStr str | isNothing expr = Nothing
             | otherwise = Just $ (eval . fromJust) expr
-  where expr = parseExp Lit Add Mul str
+  where expr = parseExp ExprT.Lit ExprT.Add ExprT.Mul str
 
 -- Exercise 3
 class Expr a where
@@ -25,9 +28,9 @@ class Expr a where
   mul :: a -> a -> a
 
 instance Expr ExprT where
-  lit = Lit
-  add = Add
-  mul = Mul
+  lit = ExprT.Lit
+  add = ExprT.Add
+  mul = ExprT.Mul
 
 -- Exercise 4
 instance Expr Integer where
@@ -55,3 +58,12 @@ instance Expr Mod7 where
 
 testExp :: Expr a => String -> Maybe a
 testExp = parseExp lit add mul
+
+-- Exercise 5
+compile :: String -> Maybe Program
+compile = parseExp lit add mul
+
+instance Expr Program where
+  lit x = (StackVM.PushI x) : []
+  add x y = x ++ y ++ (StackVM.Add : [])
+  mul x y = x ++ y ++ (StackVM.Mul : [])
