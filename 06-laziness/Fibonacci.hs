@@ -34,3 +34,12 @@ streamMap f (Cons x xs) = Cons (f x) (streamMap f xs)
 streamFromSeed :: (a -> a) -> a -> Stream a
 streamFromSeed f seed = Cons seed (streamFromSeed f next)
   where next = f seed
+
+-- Exercise 5
+nats :: Stream Integer
+nats = streamFromSeed (+1) 0
+
+ruler :: Stream Integer
+ruler = streamMap f ns
+  where ns = streamFromSeed (+1) 1
+        f = \x -> maximum [i | i <- [0 .. x], x `mod` (2 ^ i) == 0]
