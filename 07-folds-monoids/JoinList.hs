@@ -5,6 +5,7 @@ module JoinList where
 import Data.Monoid
 
 import Sized
+import Scrabble
 
 data JoinList m a = Empty
                   | Single m a
@@ -47,3 +48,5 @@ takeJ i (Append _ l r) | i <= l_size = takeJ i l
   where l_size = getSize . size $ tag l
 
 -- Exercise 3
+scoreLine :: String -> JoinList Score String
+scoreLine s = Single (scoreString s) s
